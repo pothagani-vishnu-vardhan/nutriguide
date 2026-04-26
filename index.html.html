@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>NutriGuide Pro</title>
+
+<!-- ICONS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+
+/* ===== GLOBAL ===== */
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #020617, #0f172a);
+    color: white;
+}
+
+/* ===== HERO ===== */
+.hero {
+    text-align: center;
+    padding: 50px 20px;
+    background: linear-gradient(90deg, #22c55e, #16a34a);
+}
+
+.hero h1 {
+    font-size: 40px;
+}
+
+.hero p {
+    opacity: 0.9;
+}
+
+/* ===== CONTAINER ===== */
+.container {
+    max-width: 850px;
+    margin: auto;
+    padding: 20px;
+}
+
+/* ===== CARD ===== */
+.card {
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(15px);
+    padding: 25px;
+    border-radius: 15px;
+    margin-top: 20px;
+    box-shadow: 0 0 25px rgba(34,197,94,0.15);
+    transition: 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-6px);
+}
+
+/* ===== INPUTS ===== */
+input, select {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border-radius: 8px;
+    border: none;
+    outline: none;
+}
+
+/* ===== BUTTON ===== */
+button {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(90deg, #22c55e, #16a34a);
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    transform: scale(1.05);
+}
+
+/* ===== OUTPUT ===== */
+.output {
+    margin-top: 20px;
+    padding: 15px;
+    background: rgba(0,0,0,0.6);
+    border-radius: 10px;
+    line-height: 1.7;
+    white-space: pre-line;
+}
+
+/* ===== BADGE ===== */
+.badge {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 20px;
+    background: #22c55e;
+    color: black;
+    font-size: 12px;
+    margin-bottom: 10px;
+}
+
+/* ===== FOOTER ===== */
+footer {
+    text-align: center;
+    padding: 15px;
+    margin-top: 20px;
+    background: black;
+}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:600px){
+    .hero h1 { font-size: 28px; }
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- HERO -->
+<div class="hero">
+<h1><i class="fa-solid fa-dumbbell"></i> NutriGuide Pro</h1>
+<p>Your Smart Gym Diet Planner</p>
+</div>
+
+<div class="container">
+
+<!-- FORM -->
+<div class="card">
+
+<div class="badge">Enter Your Details</div>
+
+<input type="number" id="weight" placeholder="⚖️ Weight (kg)">
+<input type="number" step="0.01" id="height" placeholder="📏 Height (meters e.g. 1.75)">
+
+<select id="goal">
+<option value="">🎯 Select Goal</option>
+<option value="gain">Muscle Gain</option>
+<option value="loss">Fat Loss</option>
+<option value="maintain">Maintenance</option>
+</select>
+
+<select id="type">
+<option value="">🥗 Diet Type</option>
+<option value="veg">Vegetarian</option>
+<option value="nonveg">Non-Vegetarian</option>
+</select>
+
+<button onclick="generatePlan()">
+<i class="fa-solid fa-bolt"></i> Generate Plan
+</button>
+
+<div class="output" id="result"></div>
+
+</div>
+
+</div>
+
+<footer>
+<p>© 2026 NutriGuide Pro</p>
+</footer>
+
+<script>
+
+function generatePlan(){
+
+let w = document.getElementById("weight").value;
+let h = document.getElementById("height").value;
+let goal = document.getElementById("goal").value;
+let type = document.getElementById("type").value;
+
+if(!w || !h || !goal || !type){
+document.getElementById("result").innerText="⚠️ Please fill all fields";
+return;
+}
+
+/* BMI */
+let bmi = w/(h*h);
+let status = bmi<18.5?"Underweight":bmi<25?"Normal":"Overweight";
+
+/* Protein */
+let factor = goal=="gain"?1.8:goal=="loss"?1.6:1.2;
+let protein = w*factor;
+
+/* Calories */
+let calories = w*(goal=="gain"?40:goal=="loss"?25:30);
+
+/* Carbs */
+let rice = goal=="gain"?"2 cups":"1 cup";
+
+/* Protein split */
+let eggs=0, chicken=0, paneer=0, dal=0, soy=0;
+
+if(type=="nonveg"){
+let eggP = protein*0.25;
+let chickP = protein*0.40;
+let panP = protein*0.20;
+let dalP = protein*0.15;
+
+eggs = Math.round(eggP/6);
+chicken = Math.round((chickP/25)*100);
+paneer = Math.round((panP/18)*100);
+dal = Math.round(dalP/8);
+}
+else{
+let panP = protein*0.40;
+let dalP = protein*0.35;
+let soyP = protein*0.25;
+
+paneer = Math.round((panP/18)*100);
+dal = Math.round(dalP/8);
+soy = Math.round((soyP/52)*100);
+}
+
+/* Diet */
+let diet="";
+
+if(type=="nonveg"){
+diet=`🔥 DAILY PLAN
+
+Calories: ${calories} kcal
+Protein: ${protein.toFixed(1)}g
+
+⏰ 8 AM:
+Eggs (${eggs}) + Milk
+
+⏰ 1 PM:
+Rice (${rice}) + Chicken (${chicken}g)
+
+⏰ 5 PM:
+Banana + Nuts
+
+⏰ 8 PM:
+Roti + Paneer (${paneer}g) + Dal (${dal} cups)`;
+}
+else{
+diet=`🔥 DAILY PLAN
+
+Calories: ${calories} kcal
+Protein: ${protein.toFixed(1)}g
+
+⏰ 8 AM:
+Paneer (${paneer/2}g) + Milk
+
+⏰ 1 PM:
+Rice (${rice}) + Dal (${dal} cups)
+
+⏰ 5 PM:
+Soy chunks (${soy}g)
+
+⏰ 8 PM:
+Roti + Paneer (${paneer/2}g)`;
+}
+
+/* Output */
+document.getElementById("result").innerText =
+`📊 BMI: ${bmi.toFixed(2)} (${status})
+
+${diet}
+
+🔁 Alternatives:
+Chicken → Fish / Eggs
+Paneer → Soy / Tofu
+Milk → Curd
+Rice → Roti`;
+
+}
+
+</script>
+
+</body>
+</html>
